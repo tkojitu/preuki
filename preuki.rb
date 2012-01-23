@@ -21,7 +21,9 @@ class Preuki < WEBrick::CGI
       res.body = "<html><body><pre>"
       text = File.read(PAGE_ROOT + req.query["view"])
       res.body << text
-      res.body << "</pre></body></html>"
+      res.body << "</pre><hr>\n"
+      res.body << ("<a href='?edit=%s'>EditText</a>\n" % req.query["view"])
+      res.body << "</body></html>"
     rescue
       on_else(req, res)
     end
@@ -29,9 +31,10 @@ class Preuki < WEBrick::CGI
 
   def on_edit(req, res)
     begin
-      res.body = "<html><body><form method='POST' action='?save=%s'>\n" % req.query["edit"]
+      res.body = "<html><body>\n"
+      res.body << "<form method='POST' action='?save=%s'>\n" % req.query["edit"]
       res.body << "<input type='submit' value='Save'><br>\n"
-      res.body << "<textarea name='text' style='width=100%' rows=25 cols=80 wrap='virtual'>"
+      res.body << "<textarea name='text' style='width:100%;height:90%' wrap='virtual'>"
       text = File.read(PAGE_ROOT + req.query["edit"])
       res.body << text
       res.body << "</textarea></form></body></html>"
