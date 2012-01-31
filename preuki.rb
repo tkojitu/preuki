@@ -59,6 +59,7 @@ module Preuki
     def show_page(page, res)
       res.body = "<html><body><pre>"
       text = File.read(PAGE_ROOT + page)
+      text = @hd.disinfect_text(text)
       Notation.new.format!(text)
       res.body << text
       res.body << "</pre><hr>\n"
@@ -73,6 +74,7 @@ module Preuki
     def on_edit(page, res)
       begin
         text = File.read(PAGE_ROOT + page)
+        text = @hd.disinfect_text(text)
         set_editor(page, res, text)
       rescue Errno::ENOENT
         set_new_page_editor(page, res)
@@ -131,6 +133,10 @@ module Preuki
   class HealthDep
     def disinfect_pagename(pagename)
       return WEBrick::HTMLUtils::escape(pagename).gsub(/\.\.|\/|\\|:/, '')
+    end
+
+    def disinfect_text(text)
+      return WEBrick::HTMLUtils::escape(text)
     end
   end
 
