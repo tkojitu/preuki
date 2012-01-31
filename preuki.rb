@@ -8,6 +8,7 @@ module Preuki
 
     def initialize
       super()
+      @hd = HealthDep.new
     end
 
     def do_GET(req, res)
@@ -42,7 +43,7 @@ module Preuki
     end
 
     def get_page(req, key)
-      return WEBrick::HTMLUtils::escape(req.query[key]).gsub(/\.\.|\/|\\|:/, '')
+      return @hd.disinfect_pagename(req.query[key])
     end
 
     def on_view(page, res)
@@ -124,6 +125,12 @@ module Preuki
       File.open(PAGE_ROOT + page, "w") do |output|
         output.print(req.query["text"])
       end
+    end
+  end
+
+  class HealthDep
+    def disinfect_pagename(pagename)
+      return WEBrick::HTMLUtils::escape(pagename).gsub(/\.\.|\/|\\|:/, '')
     end
   end
 
