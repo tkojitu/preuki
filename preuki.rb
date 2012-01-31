@@ -40,12 +40,14 @@ class Preuki < WEBrick::CGI
   def on_edit(req, res)
     begin
       res.body = "<html><body>\n"
-      res.body << "<form method='POST' action='?save=%s'>\n" % req.query["edit"]
+      res.body << "<form method='POST' action='?'>\n"
       res.body << "<input type='submit' value='Save'><br>\n"
       res.body << "<textarea name='text' style='width:100%;height:90%' wrap='virtual'>"
       text = File.read(PAGE_ROOT + req.query["edit"])
       res.body << text
-      res.body << "</textarea></form></body></html>"
+      res.body << "</textarea>\n"
+      res.body << ("<input type='hidden' name='save' value='%s'>\n" % req.query["edit"])
+      res.body << "</form></body></html>"
     rescue
       on_else(req, res)
     end
@@ -57,8 +59,7 @@ class Preuki < WEBrick::CGI
 
   def do_POST(req, res)
     res["Content-Type"] = "text/html"
-    on_else(req, res)
-    if /\Asave=/ =~ req.query_string
+    if req.query.has_key?("save")
       on_save(req, res)
     else
       on_else(req, res)
@@ -67,9 +68,9 @@ class Preuki < WEBrick::CGI
 
   def on_save(req, res)
     begin
-      pagename = req.query_string.sub(/\Asave=/, '')
+      pagename = req.query["save"]
       save_page(req, pagename)
-      show_page(res, pagename)
+      res.set_redirect(WEBrick::HTTPStatus::Found, "?view=%s" % pagename)
     rescue
       logger.error($!)
       on_else(req, res)
