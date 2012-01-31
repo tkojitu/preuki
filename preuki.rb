@@ -1,4 +1,5 @@
 #!ruby
+# -*- encoding: utf-8 -*-
 
 require 'webrick/cgi'
 
@@ -57,7 +58,9 @@ module Preuki
     end
 
     def show_page(page, res)
-      res.body = "<html><body><pre>"
+      res.body = "<html>\n"
+      res.body << "<head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'></head>\n"
+      res.body << "<body><pre>"
       text = File.read(PAGE_ROOT + page)
       text = @hd.disinfect_text(text)
       Notation.new.format!(text)
@@ -84,7 +87,9 @@ module Preuki
     end
 
     def set_editor(page, res, text)
-      res.body = "<html><body>\n"
+      res.body = "<html>\n"
+      res.body << "<head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'></head>\n"
+      res.body << "<body>\n"
       res.body << "<form method='POST' action='?'>\n"
       res.body << "<input type='submit' value='Save'><br>\n"
       res.body << "<textarea name='text' style='width:100%;height:90%' wrap='virtual'>"
