@@ -24,6 +24,8 @@ module Preuki
     def on_view(req, res)
       begin
         show_page(res, req.query["view"])
+      rescue Errno::ENOENT
+        set_redirect_to_new_page_editor(req, res)
       rescue
         on_else(req, res)
       end
@@ -39,20 +41,35 @@ module Preuki
       res.body << "</body></html>"
     end
 
+    def set_redirect_to_new_page_editor(req, res)
+        res.set_redirect(WEBrick::HTTPStatus::SeeOther,
+                         "?edit=%s" % req.query["view"])
+    end
+
     def on_edit(req, res)
       begin
+        text = File.read(PAGE_ROOT + req.query["edit"])
+        set_editor(res, text, req.query["edit"])
+      rescue Errno::ENOENT
+        set_new_page_editor(req, res)
+      rescue
+        on_else(req, res)
+      end
+    end
+
+    def set_editor(res, text, page)
         res.body = "<html><body>\n"
         res.body << "<form method='POST' action='?'>\n"
         res.body << "<input type='submit' value='Save'><br>\n"
         res.body << "<textarea name='text' style='width:100%;height:90%' wrap='virtual'>"
-        text = File.read(PAGE_ROOT + req.query["edit"])
         res.body << text
         res.body << "</textarea>\n"
-        res.body << ("<input type='hidden' name='save' value='%s'>\n" % req.query["edit"])
+        res.body << ("<input type='hidden' name='save' value='%s'>\n" % page)
         res.body << "</form></body></html>"
-      rescue
-        on_else(req, res)
-      end
+    end
+
+    def set_new_page_editor(req, res)
+      set_editor(res, "", req.query["edit"])
     end
 
     def on_else(req, res)
@@ -72,7 +89,7 @@ module Preuki
       begin
         pagename = req.query["save"]
         save_page(req, pagename)
-        res.set_redirect(WEBrick::HTTPStatus::Found, "?view=%s" % pagename)
+        res.set_redirect(WEBrick::HTTPStatus::SeeOther, "?view=%s" % pagename)
       rescue
         logger.error($!)
         on_else(req, res)
