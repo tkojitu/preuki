@@ -68,7 +68,7 @@ module Preuki
     end
 
     def set_redirect_to_new_page_editor(page, res)
-        res.set_redirect(WEBrick::HTTPStatus::SeeOther, "?edit=%s" % page)
+      res.set_redirect(WEBrick::HTTPStatus::SeeOther, "?edit=%s" % page)
     end
 
     def on_edit(page, res)
@@ -84,14 +84,14 @@ module Preuki
     end
 
     def set_editor(page, res, text)
-        res.body = "<html><body>\n"
-        res.body << "<form method='POST' action='?'>\n"
-        res.body << "<input type='submit' value='Save'><br>\n"
-        res.body << "<textarea name='text' style='width:100%;height:90%' wrap='virtual'>"
-        res.body << text
-        res.body << "</textarea>\n"
-        res.body << ("<input type='hidden' name='save' value='%s'>\n" % page)
-        res.body << "</form></body></html>"
+      res.body = "<html><body>\n"
+      res.body << "<form method='POST' action='?'>\n"
+      res.body << "<input type='submit' value='Save'><br>\n"
+      res.body << "<textarea name='text' style='width:100%;height:90%' wrap='virtual'>"
+      res.body << text
+      res.body << "</textarea>\n"
+      res.body << ("<input type='hidden' name='save' value='%s'>\n" % page)
+      res.body << "</form></body></html>"
     end
 
     def set_new_page_editor(page, res)
