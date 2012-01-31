@@ -32,6 +32,7 @@ module Preuki
     def show_page(res, pagename)
       res.body = "<html><body><pre>"
       text = File.read(PAGE_ROOT + pagename)
+      Notation.new.format!(text)
       res.body << text
       res.body << "</pre><hr>\n"
       res.body << ("<a href='?edit=%s'>EditText</a>\n" % pagename)
@@ -82,6 +83,12 @@ module Preuki
       File.open(PAGE_ROOT + pagename, "w") do |output|
         output.print(req.query["text"])
       end
+    end
+  end
+
+  class Notation
+    def format!(text)
+      text.gsub!(/\[\[\[([%0-9A-Za-z_-]+)\]\]\]/, "<a href='?view=\\1'>\\1</a>")
     end
   end
 end
