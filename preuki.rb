@@ -53,6 +53,7 @@ module Preuki
       rescue Errno::ENOENT
         set_redirect_to_new_page_editor(page, res)
       rescue
+        logger.error($!)
         on_else(page, res)
       end
     end
@@ -82,6 +83,7 @@ module Preuki
       rescue Errno::ENOENT
         set_new_page_editor(page, res)
       rescue
+        logger.error($!)
         on_else(page, res)
       end
     end
@@ -137,16 +139,18 @@ module Preuki
 
   class HealthDep
     def disinfect_pagename(pagename)
-      return WEBrick::HTMLUtils::escape(pagename).gsub(/\.\.|\/|\\|:/, '')
+      name = pagename.force_encoding("ASCII-8BIT")
+      return WEBrick::HTMLUtils::escape(name).gsub(/\.\.|\/|\\|:/, '')
     end
 
     def disinfect_text(text)
-      return WEBrick::HTMLUtils::escape(text)
+      return WEBrick::HTMLUtils::escape(text.force_encoding("ASCII-8BIT"))
     end
   end
 
   class Notation
     def format!(text)
+      text.force_encoding("ASCII-8BIT")
       text.gsub!(/\[\[\[([%0-9A-Za-z_-]+)\]\]\]/, "<a href='?view=\\1'>\\1</a>")
     end
   end
