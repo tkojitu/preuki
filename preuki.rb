@@ -64,7 +64,7 @@ module Preuki
       res.body << "<body><pre>"
       text = File.read(PAGE_ROOT + page)
       text = @hd.disinfect_text(text)
-      Notation.new.format!(text)
+      Notation.new(@hd).format!(text)
       res.body << text
       res.body << "</pre><hr>\n"
       res.body << ("<a href='?edit=%s'>EditText</a>\n" % page)
@@ -139,19 +139,37 @@ module Preuki
 
   class HealthDep
     def disinfect_pagename(pagename)
-      name = pagename.force_encoding("ASCII-8BIT")
-      return WEBrick::HTMLUtils::escape(name).gsub(/\.\.|\/|\\|:/, '')
+      pagename.force_encoding("ASCII-8BIT")
+      return WEBrick::HTMLUtils::escape(pagename).gsub(/\.\.|\/|\\|:/, '')
     end
 
     def disinfect_text(text)
-      return WEBrick::HTMLUtils::escape(text.force_encoding("ASCII-8BIT"))
+      text.force_encoding("ASCII-8BIT")
+      return WEBrick::HTMLUtils::escape(text)
+    end
+
+    def disinfect_link(name)
+      name.force_encoding("ASCII-8BIT")
+      return WEBrick::HTTPUtils::escape(name)
     end
   end
 
   class Notation
+    def initialize(health_dep)
+      @hd = health_dep
+    end
+
     def format!(text)
-      text.force_encoding("ASCII-8BIT")
-      text.gsub!(/\[\[\[([%0-9A-Za-z_-]+)\]\]\]/, "<a href='?view=\\1'>\\1</a>")
+      st = 0
+      while true
+        st = text.index(/\[\[\[[^\]]/, st)
+        break unless st
+        ed = text.index("]]]", st)
+        break unless ed
+        text[st..(ed+2)] = sprintf("<a href='?view=%s'>%s</a>",
+                                   @hd.disinfect_link(text[(st+3)..(ed-1)]),
+                                   text[(st+3)..(ed-1)])
+      end
     end
   end
 end
