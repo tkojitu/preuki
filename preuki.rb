@@ -140,7 +140,7 @@ module Preuki
   class HealthDep
     def disinfect_pagename(pagename)
       pagename.force_encoding("ASCII-8BIT")
-      return WEBrick::HTMLUtils::escape(pagename).gsub(/\.\.|\/|\\|:/, '')
+      return WEBrick::HTMLUtils::escape(pagename)
     end
 
     def disinfect_text(text)
