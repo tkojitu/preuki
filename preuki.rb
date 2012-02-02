@@ -64,7 +64,7 @@ module Preuki
       res.body << "<body><pre>"
       text = File.read(PAGE_ROOT + page)
       text = @hd.disinfect_text(text)
-      Notation.new(@hd).format!(text)
+      Notation.new.format!(text)
       res.body << text
       res.body << "</pre><hr>\n"
       res.body << ("<a href='?edit=%s'>EditText</a>\n" % page)
@@ -155,21 +155,8 @@ module Preuki
   end
 
   class Notation
-    def initialize(health_dep)
-      @hd = health_dep
-    end
-
     def format!(text)
-      st = 0
-      while true
-        st = text.index(/\[\[\[[^\]]/, st)
-        break unless st
-        ed = text.index("]]]", st)
-        break unless ed
-        text[st..(ed+2)] = sprintf("<a href='?view=%s'>%s</a>",
-                                   @hd.disinfect_link(text[(st+3)..(ed-1)]),
-                                   text[(st+3)..(ed-1)])
-      end
+      text.gsub!(/\[\[\[([0-9A-Za-z_-]+)\]\]\]/, "<a href='?view=\\1'>\\1</a>")
     end
   end
 end
