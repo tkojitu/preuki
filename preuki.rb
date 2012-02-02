@@ -79,10 +79,7 @@ module Preuki
 
     def show_page(page, res)
       res.body = "<html>\n"
-      res.body << "<head>\n"
-      res.body << "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n"
-      res.body << ("<title>%s</title>\n" % page)
-      res.body << "</head>\n"
+      add_html_head(page, res)
       res.body << "<body><pre>"
       text = File.read(PAGE_ROOT + page)
       text = @hd.disinfect_text(text)
@@ -91,6 +88,13 @@ module Preuki
       res.body << "</pre><hr>\n"
       res.body << ("<a href='?edit=%s'>EditText</a>\n" % page)
       res.body << "</body></html>"
+    end
+
+    def add_html_head(page, res)
+      res.body << "<head>\n"
+      res.body << "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n"
+      res.body << ("<title>%s</title>\n" % page)
+      res.body << "</head>\n"
     end
 
     def set_redirect_to_new_page_editor(page, res)
@@ -112,10 +116,7 @@ module Preuki
 
     def set_editor(page, res, text)
       res.body = "<html>\n"
-      res.body << "<head>\n"
-      res.body << "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n"
-      res.body << ("<title>%s</title>\n" % page)
-      res.body << "</head>\n"
+      add_html_head(page, res)
       res.body << "<body>\n"
       res.body << ("<form method='POST' action='?save=%s'>\n" % page)
       res.body << "<input type='submit' value='Save'><br>\n"
