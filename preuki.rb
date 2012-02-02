@@ -5,7 +5,7 @@ require 'webrick/cgi'
 
 module Preuki
   class PreukiCGI < WEBrick::CGI
-    PAGE_ROOT = "/media/4GB/httpd/preuki/"
+    PAGE_ROOT = "../preuki/"
 
     def initialize
       super()
