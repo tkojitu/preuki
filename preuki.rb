@@ -32,19 +32,38 @@ module Preuki
     end
 
     def command_key(req)
-      if req.query.has_key?("view")
-        return "view"
-      elsif req.query.has_key?("edit")
-        return "edit"
-      elsif req.query.has_key?("save")
-        return "save"
+      case req.request_method
+      when "GET"
+        if req.query.has_key?("view")
+          return "view"
+        elsif req.query.has_key?("edit")
+          return "edit"
+        else
+          return nil
+        end
+      when "POST"
+        query = WEBrick::HTTPUtils::parse_query(req.query_string)
+        if query.has_key?("save")
+          return "save"
+        else
+          return nil
+        end
       else
         return nil
       end
     end
 
     def get_page(req, key)
-      return @hd.disinfect_pagename(req.query[key])
+      page = case req.request_method
+             when "GET"
+               req.query[key]
+             when "POST"
+               query = WEBrick::HTTPUtils::parse_query(req.query_string)
+               query[key]
+             else
+               nil
+             end
+      return page ? @hd.disinfect_pagename(page) : nil
     end
 
     def on_view(page, res)
@@ -92,12 +111,11 @@ module Preuki
       res.body = "<html>\n"
       res.body << "<head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'></head>\n"
       res.body << "<body>\n"
-      res.body << "<form method='POST' action='?'>\n"
+      res.body << ("<form method='POST' action='?save=%s'>\n" % page)
       res.body << "<input type='submit' value='Save'><br>\n"
       res.body << "<textarea name='text' style='width:100%;height:90%' wrap='virtual'>"
       res.body << text
       res.body << "</textarea>\n"
-      res.body << ("<input type='hidden' name='save' value='%s'>\n" % page)
       res.body << "</form></body></html>"
     end
 
@@ -140,17 +158,12 @@ module Preuki
   class HealthDep
     def disinfect_pagename(pagename)
       pagename.force_encoding("ASCII-8BIT")
-      return WEBrick::HTMLUtils::escape(pagename)
+      return WEBrick::HTTPUtils::escape_form(pagename)
     end
 
     def disinfect_text(text)
       text.force_encoding("ASCII-8BIT")
       return WEBrick::HTMLUtils::escape(text)
-    end
-
-    def disinfect_link(name)
-      name.force_encoding("ASCII-8BIT")
-      return WEBrick::HTTPUtils::escape(name)
     end
   end
 
