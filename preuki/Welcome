@@ -1,3 +1,10 @@
 Welcome!
 
 Preuki is a very simple Wiki-clone.
+
+[[[ThisIsWikiName]]]
+[[[This is Wiki name]]]
+[[[This-is-Wiki-name]]]
+[[[This_is_Wiki_name]]]
+
+See preuki.rb for details.
