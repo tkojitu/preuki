@@ -176,7 +176,7 @@ module Preuki
 
   class Notation
     def format!(text)
-      text.gsub!(/\[\[\[([0-9A-Za-z_-]+)\]\]\]/, "<a href='?view=\\1'>\\1</a>")
+      text.gsub!(/\[\[\[([ \-0-9A-Z_a-z]+)\]\]\]/, "<a href='?view=\\1'>\\1</a>")
     end
   end
 end
