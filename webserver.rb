@@ -1,24 +1,24 @@
 require 'webrick'
 
 class WebServer
-  SERVER_ROOT = '/media/4GB/httpd/'
+  SERVER_ROOT = './'
   DOCUMENT_ROOT = SERVER_ROOT + 'htdocs/'
   CGI_ROOT = SERVER_ROOT + 'cgi-bin/'
   RUBYBIN = 'ruby'
 
-  def main
-    server = WEBrick::HTTPServer.new(server_options)
+  def main(port)
+    server = WEBrick::HTTPServer.new(server_options(port))
     mount_cgis(server)
     trap_signals(server)
     server.start
   end
 
-  def server_options
+  def server_options(port)
     return {
       :DocumentRoot => DOCUMENT_ROOT,
       :BindAddress => '0.0.0.0',
       :CGIInterpreter => RUBYBIN,
-      :Port => 8888
+      :Port => port
     }
   end
 
@@ -38,4 +38,6 @@ class WebServer
   end
 end
 
-WebServer.new.main
+if $0 == __FILE__
+  WebServer.new.main(ARGV[0].to_i)
+end
