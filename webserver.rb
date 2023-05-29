@@ -1,3 +1,5 @@
+# http://127.0.0.1:8888/cgi-bin/preuki.rb?view=Welcome
+
 require 'webrick'
 
 class WebServer
